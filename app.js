@@ -4,7 +4,11 @@ const morgan = require('morgan'); // morgan 모듈 -> HTTP 요청 로깅
 const nunjucks = require('nunjucks'); // 템플릿 엔진으로 Nunjucks 사용
 
 const connect = require('./schemas'); // MongoDB 연결 함수
-const { error } = require('console');
+
+// 라우터 모듈을 불러와 변수에 할당
+const indexRouter = require('./routes');
+const usersRouter = require('./routes/users');
+const commentsRouter = require('./routes/comments');
 
 const app = express(); // Express 애플리케이션 생성
 
@@ -20,6 +24,7 @@ nunjucks.configure('views', {
 
 connect(); // MongoDB에 연결
 
+
 app.use(morgan('dev')); // 로깅 미들웨어 사용 -> 개발 환경에서는 dev 포맷으로 로깅
 // 정적 파일 미들웨어 등록 -> public 폴더의 파일에 접근 가능
 app.use(express.static(path.join(__dirname, 'public')));
@@ -27,6 +32,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 // URL 인코딩 파싱 미들웨어 등록
 app.use(express.urlencoded({ extended: false }));
+
+// 라우터를 등록
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/comments', commentsRouter);
 
 // 404 에러 처리 미들웨어
 app.use((req, res, next) => {
